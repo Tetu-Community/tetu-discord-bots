@@ -188,7 +188,7 @@ async function runTetuBalDiscountBot () {
 }
 
 async function runTetuQiDiscountBot () {
-  const bot = newClientWithStatusUpdater(process.env.TETU_BAL_DISCOUNT_BOT_KEY)
+  const bot = newClientWithStatusUpdater(process.env.TETU_QI_DISCOUNT_BOT_KEY)
   const guild = await bot.guilds.fetch(process.env.GUILD_ID)
   if (!guild) throw new Error('cannot find guild')
   bot.once('ready', loop)
