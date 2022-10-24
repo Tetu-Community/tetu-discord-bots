@@ -82,21 +82,38 @@ async function tetuSwapPriceQuote ({ provider, router, pair, fee, inputToken, ou
   return res.toString()
 }
 
-function newClientWithStatusUpdater (key) {
+async function newClientWithStatusUpdater (key) {
   const bot = new Client({ intents: [] })
   bot.statusUpdater = new StatusUpdater(bot)
   bot.login(key)
-  return bot
+
+  const guilds = []
+
+  for (const guildId of process.env.GUILD_IDS.split(',')) {
+    try {
+      const guild = await bot.guilds.fetch(guildId)
+      if (!guild) throw new Error('cannot find guild with id', guildId)
+      guilds.push(guild)
+    } catch (err) {
+      console.log('could not find guild', err)
+    }
+  }
+
+  return [bot, guilds]
 }
 
-async function updateStatus (bot, guild, nickname, statusMsg) {
+async function updateStatus (bot, guilds, nickname, statusMsg) {
   if (statusMsg.length > 128) {
     statusMsg = statusMsg.substring(0, 128)
   }
 
+  if (process.env.VERBOSE) console.log('updating bot', nickname, statusMsg)
+
   if (nickname) {
-    const botUser = await guild.members.fetch(bot.user.id)
-    botUser.setNickname(nickname)
+    for (const guild of guilds) {
+      const botUser = await guild.members.fetch(bot.user.id)
+      botUser.setNickname(nickname)
+    }
   }
 
   const s = { type: 'WATCHING', name: statusMsg }
@@ -105,9 +122,7 @@ async function updateStatus (bot, guild, nickname, statusMsg) {
 }
 
 async function runTetuPriceBot () {
-  const bot = newClientWithStatusUpdater(process.env.TETU_PRICE_BOT_KEY)
-  const guild = await bot.guilds.fetch(process.env.GUILD_ID)
-  if (!guild) throw new Error('cannot find guild')
+  const [bot, guilds] = await newClientWithStatusUpdater(process.env.TETU_PRICE_BOT_KEY)
   bot.once('ready', loop)
 
   async function loop () {
@@ -115,7 +130,7 @@ async function runTetuPriceBot () {
       const resp = await axios.get('https://api.coingecko.com/api/v3/coins/tetu')
       await updateStatus(
         bot,
-        guild,
+        guilds,
         `TETU $${resp.data.market_data.current_price.usd}`,
         `24h: ${BigNumber(resp.data.market_data.price_change_percentage_24h_in_currency.usd).toFixed(1)}%`
       )
@@ -129,9 +144,7 @@ async function runTetuPriceBot () {
 }
 
 async function runTetuCirculatingSupplyBot () {
-  const bot = newClientWithStatusUpdater(process.env.TETU_CIRCULATING_SUPPLY_BOT_KEY)
-  const guild = await bot.guilds.fetch(process.env.GUILD_ID)
-  if (!guild) throw new Error('cannot find guild')
+  const [bot, guilds] = await newClientWithStatusUpdater(process.env.TETU_CIRCULATING_SUPPLY_BOT_KEY)
   bot.once('ready', loop)
 
   async function loop () {
@@ -139,7 +152,7 @@ async function runTetuCirculatingSupplyBot () {
       const resp = await axios.get('https://api.tetu.io/api/v1/info/circulationSupply')
       await updateStatus(
         bot,
-        guild,
+        guilds,
         BigNumber(resp.data).toFormat(2),
         'Circulating Supply'
       )
@@ -153,9 +166,7 @@ async function runTetuCirculatingSupplyBot () {
 }
 
 async function runTetuBalDiscountBot () {
-  const bot = newClientWithStatusUpdater(process.env.TETU_BAL_DISCOUNT_BOT_KEY)
-  const guild = await bot.guilds.fetch(process.env.GUILD_ID)
-  if (!guild) throw new Error('cannot find guild')
+  const [bot, guilds] = await newClientWithStatusUpdater(process.env.TETU_BAL_DISCOUNT_BOT_KEY)
   bot.once('ready', loop)
 
   async function loop () {
@@ -170,11 +181,10 @@ async function runTetuBalDiscountBot () {
 
       const bptForTetuBal = BigNumber(resp.toString()).shiftedBy(-18)
       const discount = BigNumber(1).minus(bptForTetuBal)
-      console.log(discount.toString())
 
       await updateStatus(
         bot,
-        guild,
+        guilds,
         `${bptForTetuBal.toFixed(4)} (${discount.times(100).toFixed(1)}%)`,
         'tetuBAL discount'
       )
@@ -188,9 +198,7 @@ async function runTetuBalDiscountBot () {
 }
 
 async function runTetuQiDiscountBot () {
-  const bot = newClientWithStatusUpdater(process.env.TETU_QI_DISCOUNT_BOT_KEY)
-  const guild = await bot.guilds.fetch(process.env.GUILD_ID)
-  if (!guild) throw new Error('cannot find guild')
+  const [bot, guilds] = await newClientWithStatusUpdater(process.env.TETU_QI_DISCOUNT_BOT_KEY)
   bot.once('ready', loop)
 
   async function loop () {
@@ -207,11 +215,10 @@ async function runTetuQiDiscountBot () {
 
       const qiForTetuQi = BigNumber(resp.toString()).shiftedBy(-18)
       const discount = BigNumber(1).minus(qiForTetuQi)
-      console.log(discount.toString())
 
       await updateStatus(
         bot,
-        guild,
+        guilds,
         `${qiForTetuQi.toFixed(4)} (${discount.times(100).toFixed(1)}%)`,
         'tetuQI discount'
       )
@@ -224,11 +231,7 @@ async function runTetuQiDiscountBot () {
   }
 }
 
-async function main () {
-  runTetuPriceBot()
-  runTetuCirculatingSupplyBot()
-  runTetuBalDiscountBot()
-  runTetuQiDiscountBot()
-}
-
-main()
+setTimeout(runTetuPriceBot, 0)
+setTimeout(runTetuCirculatingSupplyBot, 0)
+setTimeout(runTetuBalDiscountBot, 0)
+setTimeout(runTetuQiDiscountBot, 0)
