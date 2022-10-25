@@ -135,10 +135,10 @@ async function runTetuPriceBot () {
         `24h: ${BigNumber(resp.data.market_data.price_change_percentage_24h_in_currency.usd).toFixed(1)}%`
       )
     } catch (err) {
-      console.log('error updating tetu price bot', err)
+      console.log('error in runTetuPriceBot', err)
     }
 
-    await delay(ms('1m'))
+    await delay(ms('2m'))
     loop()
   }
 }
@@ -157,10 +157,10 @@ async function runTetuCirculatingSupplyBot () {
         'Circulating Supply'
       )
     } catch (err) {
-      console.log('error updating tetu circulatung supply bot', err)
+      console.log('error in runTetuCirculatingSupplyBot', err)
     }
 
-    await delay(ms('1m'))
+    await delay(ms('5m'))
     loop()
   }
 }
@@ -189,10 +189,10 @@ async function runTetuBalDiscountBot () {
         'tetuBAL discount'
       )
     } catch (err) {
-      console.log('error updating tetu circulatung supply bot', err)
+      console.log('error in runTetuBalDiscountBot', err)
     }
 
-    await delay(ms('1m'))
+    await delay(ms('5m'))
     loop()
   }
 }
@@ -223,10 +223,10 @@ async function runTetuQiDiscountBot () {
         'tetuQI discount'
       )
     } catch (err) {
-      console.log('error updating tetu circulatung supply bot', err)
+      console.log('error in runTetuQiDiscountBot', err)
     }
 
-    await delay(ms('1m'))
+    await delay(ms('5m'))
     loop()
   }
 }
