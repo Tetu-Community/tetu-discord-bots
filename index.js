@@ -231,7 +231,41 @@ async function runTetuQiDiscountBot () {
   }
 }
 
+async function runTetuTvlBot () {
+  const [bot, guilds] = await newClientWithStatusUpdater(process.env.TETU_TVL_BOT_KEY)
+  bot.once('ready', loop)
+
+  async function loop () {
+    try {
+      const provider = getProvider('polygon')
+
+      const contractReader = new ethers.Contract(
+        '0xCa9C8Fba773caafe19E6140eC0A7a54d996030Da',
+        require('./abis/TetuContractReader.json'),
+        provider
+      )
+
+      const vaults = await contractReader.vaults()
+
+      const tvl = await contractReader.totalTvlUsdc(vaults)
+
+      await updateStatus(
+        bot,
+        guilds,
+        `$${BigNumber(tvl.toString()).shiftedBy(-18).toFormat(2)}`,
+        'TVL Polygon'
+      )
+    } catch (err) {
+      console.log('error in runTetuTvlBot', err)
+    }
+
+    await delay(ms('5m'))
+    loop()
+  }
+}
+
 setTimeout(runTetuPriceBot, 0)
 setTimeout(runTetuCirculatingSupplyBot, 0)
 setTimeout(runTetuBalDiscountBot, 0)
 setTimeout(runTetuQiDiscountBot, 0)
+setTimeout(runTetuTvlBot, 0)
