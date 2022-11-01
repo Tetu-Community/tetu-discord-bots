@@ -5,15 +5,20 @@ const { Client } = require('discord.js')
 const StatusUpdater = require('@tmware/status-rotate')
 const BigNumber = require('bignumber.js')
 const ethers = require('ethers')
+const reject = require('lodash.reject')
 
 const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 
 const CONTRACT_READER_ADDRESSES = {
   polygon: '0xCa9C8Fba773caafe19E6140eC0A7a54d996030Da',
-  fantom: '0xa4EB2E1284D9E30fb656Fe6b34c1680Ef5d4cBFC'
-  // bsc: '',
-  // mainnet: ''
+  fantom: '0xa4EB2E1284D9E30fb656Fe6b34c1680Ef5d4cBFC',
+  bsc: '0xE8210A2d1a7B56115a47B8C06a72356773f6838E',
+  mainnet: '0x6E4D8CAc827B52E7E67Ae8f68531fafa36eaEf0B'
 }
+
+const IGNORED_VAULTS = [
+  '0x8A12335d417F5aa82D803769b34c5b9d990a623B'
+]
 
 function getProvider (network) {
   const urlStr = process.env[`${network.toUpperCase()}_RPC_HTTP`]
@@ -257,7 +262,7 @@ async function runTetuTvlBot () {
 
         const vaults = await contractReader.vaults()
 
-        const resp = await contractReader.totalTvlUsdc(vaults)
+        const resp = await contractReader.totalTvlUsdc(reject(vaults, v => IGNORED_VAULTS.includes(v)))
 
         tvl = tvl.plus(resp.toString())
       }
