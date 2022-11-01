@@ -8,6 +8,13 @@ const ethers = require('ethers')
 
 const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 
+const CONTRACT_READER_ADDRESSES = {
+  polygon: '0xCa9C8Fba773caafe19E6140eC0A7a54d996030Da',
+  fantom: '0xa4EB2E1284D9E30fb656Fe6b34c1680Ef5d4cBFC'
+  // bsc: '',
+  // mainnet: ''
+}
+
 function getProvider (network) {
   const urlStr = process.env[`${network.toUpperCase()}_RPC_HTTP`]
   if (!urlStr) throw new Error(`no RPC provider for network ${network} found!`)
@@ -237,23 +244,29 @@ async function runTetuTvlBot () {
 
   async function loop () {
     try {
-      const provider = getProvider('polygon')
+      let tvl = BigNumber(0)
 
-      const contractReader = new ethers.Contract(
-        '0xCa9C8Fba773caafe19E6140eC0A7a54d996030Da',
-        require('./abis/TetuContractReader.json'),
-        provider
-      )
+      for (const [chain, addr] of Object.entries(CONTRACT_READER_ADDRESSES)) {
+        const provider = getProvider(chain)
 
-      const vaults = await contractReader.vaults()
+        const contractReader = new ethers.Contract(
+          addr,
+          require('./abis/TetuContractReader.json'),
+          provider
+        )
 
-      const tvl = await contractReader.totalTvlUsdc(vaults)
+        const vaults = await contractReader.vaults()
+
+        const resp = await contractReader.totalTvlUsdc(vaults)
+
+        tvl = tvl.plus(resp.toString())
+      }
 
       await updateStatus(
         bot,
         guilds,
         `$${BigNumber(tvl.toString()).shiftedBy(-18).toFormat(2)}`,
-        'TVL Polygon'
+        'Total Value Locked'
       )
     } catch (err) {
       console.log('error in runTetuTvlBot', err)
