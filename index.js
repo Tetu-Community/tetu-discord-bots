@@ -20,6 +20,10 @@ const IGNORED_VAULTS = [
   '0x8A12335d417F5aa82D803769b34c5b9d990a623B'
 ]
 
+function truncateErr (err) {
+  return (err || '').toString().substring(0, 128)
+}
+
 function getProvider (network) {
   const urlStr = process.env[`${network.toUpperCase()}_RPC_HTTP`]
   if (!urlStr) throw new Error(`no RPC provider for network ${network} found!`)
@@ -107,7 +111,7 @@ async function newClientWithStatusUpdater (key) {
       if (!guild) throw new Error('cannot find guild with id', guildId)
       guilds.push(guild)
     } catch (err) {
-      console.log('could not find guild', err)
+      console.log('could not find guild', truncateErr(err))
     }
   }
 
@@ -147,7 +151,7 @@ async function runTetuPriceBot () {
         `24h: ${BigNumber(resp.data.market_data.price_change_percentage_24h_in_currency.usd).toFixed(1)}%`
       )
     } catch (err) {
-      console.log('error in runTetuPriceBot', err)
+      console.log('error in runTetuPriceBot', truncateErr(err))
     }
 
     await delay(ms('2m'))
@@ -169,7 +173,7 @@ async function runTetuCirculatingSupplyBot () {
         'Circulating Supply'
       )
     } catch (err) {
-      console.log('error in runTetuCirculatingSupplyBot', err)
+      console.log('error in runTetuCirculatingSupplyBot', truncateErr(err))
     }
 
     await delay(ms('5m'))
@@ -201,7 +205,7 @@ async function runTetuBalDiscountBot () {
         'tetuBAL discount'
       )
     } catch (err) {
-      console.log('error in runTetuBalDiscountBot', err)
+      console.log('error in runTetuBalDiscountBot', truncateErr(err))
     }
 
     await delay(ms('5m'))
@@ -235,7 +239,7 @@ async function runTetuQiDiscountBot () {
         'tetuQI discount'
       )
     } catch (err) {
-      console.log('error in runTetuQiDiscountBot', err)
+      console.log('error in runTetuQiDiscountBot', truncateErr(err))
     }
 
     await delay(ms('5m'))
@@ -274,7 +278,7 @@ async function runTetuTvlBot () {
         'Total Value Locked'
       )
     } catch (err) {
-      console.log('error in runTetuTvlBot', err)
+      console.log('error in runTetuTvlBot', truncateErr(err))
     }
 
     await delay(ms('5m'))
