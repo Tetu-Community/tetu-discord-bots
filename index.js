@@ -16,9 +16,11 @@ const CONTRACT_READER_ADDRESSES = {
   mainnet: '0x6E4D8CAc827B52E7E67Ae8f68531fafa36eaEf0B'
 }
 
-const IGNORED_VAULTS = [
-  '0x8A12335d417F5aa82D803769b34c5b9d990a623B'
-]
+const EXCLUDED_VAULTS = {
+  all: ['0x8A12335d417F5aa82D803769b34c5b9d990a623B'],
+  mainnet: ['0xfe700d523094cc6c673d78f1446ae0743c89586e'],
+  fantom: ['0x27c616838b8935c8a34011d0e88ba335040ac7b1']
+}
 
 function truncateErr (err) {
   return (err || '').toString().substring(0, 128)
@@ -266,7 +268,12 @@ async function runTetuTvlBot () {
 
         const vaults = await contractReader.vaults()
 
-        const resp = await contractReader.totalTvlUsdc(reject(vaults, v => IGNORED_VAULTS.includes(v)))
+        const resp = await contractReader.totalTvlUsdc(reject(vaults, v => {
+          return (
+            (EXCLUDED_VAULTS[chain] || []).includes(v.toLowerCase()) ||
+            (EXCLUDED_VAULTS.all || []).includes(v.toLowerCase())
+          )
+        }))
 
         tvl = tvl.plus(resp.toString())
       }
