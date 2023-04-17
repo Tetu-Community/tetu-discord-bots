@@ -219,11 +219,9 @@ async function runTetuQiDiscountBot () {
 
   async function loop () {
     try {
-      const resp = await tetuSwapPriceQuote({
+      const resp = await balancerPriceQuote({
         provider: getProvider('polygon'),
-        router: '0xBCA055F25c3670fE0b1463e8d470585Fe15Ca819',
-        fee: 10,
-        pair: '0xbcdd0e38f759f8c07d8416df15d0b3e0f9146d08',
+        poolId: '0xd80ef9fabfdc3b52e17f74c383cf88ee2efbf0b6000000000000000000000a65',
         inputToken: '0x4cd44ced63d9a6fef595f6ad3f7ced13fceac768',
         outputToken: '0x580a84c73811e1839f75d86d75d88cca0c241ff4',
         inputAmount: ethers.utils.parseEther('1')
