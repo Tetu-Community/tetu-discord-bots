@@ -7,20 +7,3 @@ Tetu Discord Bots
 4. Set env vars from `.env.example` in your environment
 5. Run `npm start`
 
-## Hosted bots
-
-Price Bot
-https://discord.com/oauth2/authorize?client_id=1034122896836132944&scope=bot&permissions=67108864
-
-Circulating Supply Bot
-https://discord.com/oauth2/authorize?client_id=1034208216835432478&scope=bot&permissions=67108864
-
-TVL Bot
-https://discord.com/oauth2/authorize?client_id=1035214776793575444&scope=bot&permissions=67108864
-
-TetuBAL Discount Bot
-https://discord.com/oauth2/authorize?client_id=1034208326340321311&scope=bot&permissions=67108864
-
-TetuQI Discount Bot
-https://discord.com/oauth2/authorize?client_id=1034208397991608391&scope=bot&permissions=67108864
-
