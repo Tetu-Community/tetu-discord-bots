@@ -12,17 +12,6 @@ dotenv.config();
 
 const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 
-const CONTRACT_READER_ADDRESSES = {
-  polygon: '0xCa9C8Fba773caafe19E6140eC0A7a54d996030Da',
-  fantom: '0xa4EB2E1284D9E30fb656Fe6b34c1680Ef5d4cBFC',
-  bsc: '0xE8210A2d1a7B56115a47B8C06a72356773f6838E',
-  mainnet: '0x6E4D8CAc827B52E7E67Ae8f68531fafa36eaEf0B',
-}
-
-const IGNORED_VAULTS = [
-  '0x8A12335d417F5aa82D803769b34c5b9d990a623B',
-]
-
 function truncateErr (err) {
   return (err || '').toString().substring(0, 128)
 }
@@ -198,7 +187,7 @@ async function runTetuBalDiscountBot () {
     try {
       const resp = await balancerPriceQuote({
         provider: getProvider('polygon'),
-        poolId: '0xb797adfb7b268faeaa90cadbfed464c76ee599cd0002000000000000000005ba',
+        poolId: '0x7af62c1ebf97034b7542ccec13a2e79bbcf34380000000000000000000000c13',
         inputToken: '0x7fc9e0aa043787bfad28e29632ada302c790ce33',
         outputToken: '0x3d468ab2329f296e1b9d8476bb54dd77d8c2320f',
         inputAmount: ethers.utils.parseEther('1'),
@@ -284,5 +273,5 @@ async function runTetuTvlBot () {
 setTimeout(runTetuPriceBot, 0)
 setTimeout(runTetuCirculatingSupplyBot, 0)
 setTimeout(runTetuBalDiscountBot, 0)
-setTimeout(runTetuQiDiscountBot, 0)
+//setTimeout(runTetuQiDiscountBot, 0)
 setTimeout(runTetuTvlBot, 0)
